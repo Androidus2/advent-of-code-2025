@@ -37,12 +37,56 @@ class AdventOfCode:
 
             position = position % 100
         return zeroCnt
+    
+    @staticmethod
+    def __d2p1(fileName):
+        with open(fileName) as f:
+            lines = f.readlines()
+        f.close()
+
+        line = lines[0]
+        ans = 0
+
+        for interval in line.split(','):
+            left, right = [int(x) for x in interval.split('-')]
+            for i in range(left, right + 1):
+                strNum = str(i)
+                n = len(strNum) // 2
+                if strNum[:n] == strNum[n:]:
+                    ans += i
+        return ans
+    
+    @staticmethod
+    def __d2p2(fileName):
+        with open(fileName) as f:
+            lines = f.readlines()
+        f.close()
+
+        line = lines[0]
+        ans = 0
+
+        for interval in line.split(','):
+            left, right = [int(x) for x in interval.split('-')]
+            for i in range(left, right + 1):
+                strNum = str(i)
+                ok = True
+                for n in range(1, len(strNum)):
+                    if strNum[:n] * (len(strNum) // n) == strNum:
+                        ok = False
+                        break
+                if not ok:
+                    ans += i
+        return ans
 
     __table = {
         1: {
             1: __d1p1,
             2: __d1p2
         },
+        2:{
+            1: __d2p1,
+            2: __d2p2
+        }
     }
 
     @staticmethod
@@ -56,4 +100,4 @@ class AdventOfCode:
             print("Day or part not found")
 
 # Usage
-AdventOfCode.Solve(1, 2, "Inputs/Day1/p1.txt")
+AdventOfCode.Solve(2, 2, "Inputs/Day2/p2.txt")
