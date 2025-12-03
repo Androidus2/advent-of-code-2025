@@ -1,3 +1,5 @@
+from functools import cache
+
 class AdventOfCode:
 
     @staticmethod
@@ -77,6 +79,66 @@ class AdventOfCode:
                 if not ok:
                     ans += i
         return ans
+    
+    @staticmethod
+    def __d3p1(fileName):
+        def getMaxDigitFromLine(line):
+            if len(line) == 0:
+                return (0, -1)
+            maxx = int(line[0])
+            maxi = 0
+            for i in range(len(line)):
+                ch = line[i]
+                digit = int(ch)
+                if digit > maxx:
+                    maxx = digit
+                    maxi = i
+            return (maxx, maxi)
+
+        with open(fileName) as f:
+            lines = f.readlines()
+
+        ans = 0
+        
+        for i in range(len(lines)):
+            line = lines[i]
+            if i != len(lines) - 1:
+                line = line[:-1]
+            
+            maxx, maxi = getMaxDigitFromLine(line)
+            if maxi == len(line) - 1:
+                secondMaxx = maxx
+                maxx, _ = getMaxDigitFromLine(line[:maxi])
+            else:
+                secondMaxx, _ = getMaxDigitFromLine(line[maxi + 1:])
+            
+            ans += maxx * 10 + secondMaxx
+        return ans
+
+    @staticmethod
+    def __d3p2(fileName):
+        @cache
+        def solve(string, digitsToPick):
+            if digitsToPick == 0:
+                return 0
+            if digitsToPick > len(string):
+                return -1
+            elif digitsToPick == len(string):
+                return int(string)
+            return max(int(string[0]) * pow(10, digitsToPick - 1) + solve(string[1:], digitsToPick-1), solve(string[1:], digitsToPick))
+
+        with open(fileName) as f:
+            lines = f.readlines()
+
+        ans = 0
+        
+        for i in range(len(lines)):
+            line = lines[i]
+            if i != len(lines) - 1:
+                line = line[:-1]
+            
+            ans += solve(line, 12)
+        return ans
 
     __table = {
         1: {
@@ -86,6 +148,10 @@ class AdventOfCode:
         2:{
             1: __d2p1,
             2: __d2p2
+        },
+        3: {
+            1: __d3p1,
+            2: __d3p2
         }
     }
 
@@ -100,4 +166,4 @@ class AdventOfCode:
             print("Day or part not found")
 
 # Usage
-AdventOfCode.Solve(2, 2, "Inputs/Day2/p2.txt")
+AdventOfCode.Solve(3, 2, "Inputs/Day3/p3.txt")
