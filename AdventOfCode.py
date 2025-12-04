@@ -139,6 +139,73 @@ class AdventOfCode:
             
             ans += solve(line, 12)
         return ans
+    
+    @staticmethod
+    def __d4p1(fileName):
+        with open(fileName) as f:
+            lines = f.readlines()
+
+        neighs = [-1, 0, 1]
+        
+        n = len(lines)
+        m = len(lines[0]) - 1
+        ans = 0
+        for i in range(n):
+            line = lines[i]
+            if i != n - 1:
+                line = line[:-1]
+            for j in range(m):
+                cnt = 0
+                for yOff in neighs:
+                    for xOff in neighs:
+                        if xOff == 0 and yOff == 0:
+                            continue
+                        x = j + xOff
+                        y = i + yOff
+                        if x >= 0 and x < m and y >= 0 and y < n and lines[y][x] == '@':
+                            cnt += 1
+                if cnt < 4 and lines[i][j] == '@':
+                    ans += 1
+        return ans
+    
+    @staticmethod
+    def __d4p2(fileName):
+        with open(fileName) as f:
+            lines = f.readlines()
+
+        neighs = [-1, 0, 1]
+        
+        n = len(lines)
+        m = len(lines[0]) - 1
+        ans = 0
+        i = 0
+
+        while i < n:
+            line = lines[i].strip()
+            lines[i] = [line[k] for k in range(m)]
+            i += 1
+        i = 0
+
+        while i < n:
+            j = 0
+            while j < m:
+                cnt = 0
+                for yOff in neighs:
+                    for xOff in neighs:
+                        if xOff == 0 and yOff == 0:
+                            continue
+                        x = j + xOff
+                        y = i + yOff
+                        if x >= 0 and x < m and y >= 0 and y < n and lines[y][x] == '@':
+                            cnt += 1
+                if cnt < 4 and lines[i][j] == '@':
+                    ans += 1
+                    lines[i][j] = '.'
+                    i = max(0, i - 1)
+                    j = max(-1, j - 2)
+                j += 1
+            i += 1
+        return ans
 
     __table = {
         1: {
@@ -152,6 +219,10 @@ class AdventOfCode:
         3: {
             1: __d3p1,
             2: __d3p2
+        },
+        4: {
+            1: __d4p1,
+            2: __d4p2
         }
     }
 
@@ -166,4 +237,4 @@ class AdventOfCode:
             print("Day or part not found")
 
 # Usage
-AdventOfCode.Solve(3, 2, "Inputs/Day3/p3.txt")
+AdventOfCode.Solve(4, 2, "Inputs/Day4/p4.txt")
