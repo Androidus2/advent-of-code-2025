@@ -206,6 +206,54 @@ class AdventOfCode:
                 j += 1
             i += 1
         return ans
+    
+    def __d5p1(fileName):
+        with open(fileName) as f:
+            lines = f.readlines()
+        
+        isReadingFreshRange = True
+
+        ranges = []
+        ans = 0
+
+        for line in lines:
+            if line.strip() == '':
+                isReadingFreshRange = False
+                continue
+            if isReadingFreshRange:
+                a, b = [int(x) for x in line.split('-')]
+                ranges.append((a, b))
+            else:
+                a = int(line)
+                for range in ranges:
+                    if a >= range[0] and a <= range[1]:
+                        ans += 1
+                        break
+        return ans
+    
+    def __d5p2(fileName):
+        with open(fileName) as f:
+            lines = f.readlines()
+        ranges = []
+        ans = 0
+
+        for line in lines:
+            if line.strip() == '':
+                break
+            a, b = [int(x) for x in line.split('-')]
+            ranges.append((a, b))
+        
+        ranges.sort(key=lambda x: (x[1], x[0]))
+        mergedRanges = []
+        for rng in ranges:
+            mergedRanges.append(rng)
+            while len(mergedRanges) > 1 and mergedRanges[-2][1] >= mergedRanges[-1][0]:
+                mergedRanges[-2] = (min(mergedRanges[-2][0], mergedRanges[-1][0]), mergedRanges[-1][1])
+                mergedRanges.pop()
+        
+        for rng in mergedRanges:
+            ans += rng[1] - rng[0] + 1
+        return ans
 
     __table = {
         1: {
@@ -223,6 +271,10 @@ class AdventOfCode:
         4: {
             1: __d4p1,
             2: __d4p2
+        },
+        5: {
+            1: __d5p1,
+            2: __d5p2
         }
     }
 
@@ -237,4 +289,4 @@ class AdventOfCode:
             print("Day or part not found")
 
 # Usage
-AdventOfCode.Solve(4, 2, "Inputs/Day4/p4.txt")
+AdventOfCode.Solve(5, 2, "Inputs/Day5/p5.txt")
