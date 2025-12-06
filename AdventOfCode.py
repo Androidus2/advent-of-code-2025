@@ -207,6 +207,7 @@ class AdventOfCode:
             i += 1
         return ans
     
+    @staticmethod
     def __d5p1(fileName):
         with open(fileName) as f:
             lines = f.readlines()
@@ -231,6 +232,7 @@ class AdventOfCode:
                         break
         return ans
     
+    @staticmethod
     def __d5p2(fileName):
         with open(fileName) as f:
             lines = f.readlines()
@@ -254,6 +256,81 @@ class AdventOfCode:
         for rng in mergedRanges:
             ans += rng[1] - rng[0] + 1
         return ans
+    
+    @staticmethod
+    def __d6p1(fileName):
+        with open(fileName) as f:
+            lines = f.readlines()
+        
+        numbers = []
+        operators = []
+        n = len(lines)
+
+        for i in range(n):
+            line = lines[i]
+            if i == n - 1:
+                operators = line.split()
+                break
+            lineNumbers = [int(x) for x in line.split()]
+            numbers.append(lineNumbers)
+        
+        m = len(numbers[0])
+        ans = 0
+
+        for j in range(m):
+            res = numbers[0][j]
+            for i in range(1, n - 1):
+                if operators[j] == '+':
+                    res += numbers[i][j]
+                else:
+                    res *= numbers[i][j]
+            ans += res
+        return ans
+
+    @staticmethod
+    def __d6p2(fileName):
+        def isColumnOfSpaces(lines, column, n):
+            for i in range(n):
+                if lines[i][column] != ' ':
+                    return False
+            return True
+        
+        def calculateColumnNumber(lines, column, n):
+            number = 0
+            for i in range(n - 1):
+                if lines[i][column] != ' ':
+                    number = number * 10 + int(lines[i][column])
+            return number
+
+        with open(fileName) as f:
+            lines = f.readlines()
+        operators = lines[-1].split()
+        n = len(lines)
+        m = len(operators)
+        numberEndPositions = [-1]
+        ans = 0
+
+        for i in range(n - 1):
+            lines[i] = lines[i][:-1]
+
+        for j in range(len(lines[0])):
+            if isColumnOfSpaces(lines, j, n):
+                numberEndPositions.append(j)
+        numberEndPositions.append(len(lines[0]))
+
+        for j in range(m):
+            res = 0
+            if operators[j] == '*':
+                res = 1
+            for k in range(numberEndPositions[j] + 1, numberEndPositions[j + 1]):
+                columnNumber = calculateColumnNumber(lines, k, n)
+                if operators[j] == '+':
+                    res += columnNumber
+                else:
+                    res *= columnNumber
+            ans += res
+        return ans
+        
 
     __table = {
         1: {
@@ -275,6 +352,10 @@ class AdventOfCode:
         5: {
             1: __d5p1,
             2: __d5p2
+        },
+        6: {
+            1: __d6p1,
+            2: __d6p2
         }
     }
 
@@ -289,4 +370,4 @@ class AdventOfCode:
             print("Day or part not found")
 
 # Usage
-AdventOfCode.Solve(5, 2, "Inputs/Day5/p5.txt")
+AdventOfCode.Solve(6, 2, "Inputs/Day6/p6.txt")
