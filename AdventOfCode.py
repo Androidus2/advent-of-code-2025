@@ -330,7 +330,54 @@ class AdventOfCode:
                     res *= columnNumber
             ans += res
         return ans
+    
+    @staticmethod
+    def __d7p1(fileName):
+        with open(fileName) as f:
+            lines = f.readlines()
+
+        n = len(lines)
+        m = len(lines[0]) - 1
+        ans = 0
+        beams = [False] * m
+        for j in range(m):
+            if lines[0][j] == 'S':
+                beams[j] = True
         
+        for i in range(1, n):
+            for j in range(m):
+                if lines[i][j] == '^' and beams[j]:
+                    ans += 1
+                    beams[j] = False
+                    if j > 0:
+                        beams[j - 1] = True
+                    if j < m - 1:
+                        beams[j + 1] = True
+
+        return ans
+    
+    @staticmethod
+    def __d7p2(fileName):
+        with open(fileName) as f:
+            lines = f.readlines()
+
+        n = len(lines)
+        m = len(lines[0]) - 1
+        beams = [0] * m
+        for j in range(m):
+            if lines[0][j] == 'S':
+                beams[j] = 1
+        
+        for i in range(1, n):
+            for j in range(m):
+                if lines[i][j] == '^' and beams[j] > 0:
+                    if j > 0:
+                        beams[j - 1] += beams[j]
+                    if j < m - 1:
+                        beams[j + 1] += beams[j]
+                    beams[j] = 0
+
+        return sum(beams)
 
     __table = {
         1: {
@@ -356,6 +403,10 @@ class AdventOfCode:
         6: {
             1: __d6p1,
             2: __d6p2
+        },
+        7: {
+            1: __d7p1,
+            2: __d7p2
         }
     }
 
@@ -370,4 +421,4 @@ class AdventOfCode:
             print("Day or part not found")
 
 # Usage
-AdventOfCode.Solve(6, 2, "Inputs/Day6/p6.txt")
+AdventOfCode.Solve(7, 2, "Inputs/Day7/p7.txt")
