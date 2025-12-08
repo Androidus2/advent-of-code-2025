@@ -378,6 +378,102 @@ class AdventOfCode:
                     beams[j] = 0
 
         return sum(beams)
+    
+    @staticmethod
+    def __d8p1(fileName):
+        import math
+        with open(fileName) as f:
+            lines = f.readlines()
+
+        points = []
+        for line in lines:
+            point = [int(x) for x in line.split(',')]
+            points.append(point)
+
+        circuits = [-1] * len(points)
+        circuitCnt = 0
+        distances = []
+        for i in range(len(points)):
+            for j in range(i + 1, len(points)):
+                dist = math.sqrt(pow(points[i][0] - points[j][0], 2) + pow(points[i][1] - points[j][1], 2) + pow(points[i][2] - points[j][2], 2))
+                distances.append((dist, i, j))
+        
+        distances.sort()
+
+        maxConnections = 1000
+        for entryInd in range(maxConnections):
+            entry = distances[entryInd]
+            dist, i, j = entry
+
+            if circuits[i] == -1 and circuits[j] == -1:
+                circuits[i] = circuitCnt
+                circuits[j] = circuitCnt
+                circuitCnt += 1
+            elif circuits[j] == -1:
+                circuits[j] = circuits[i]
+            elif circuits[i] == -1:
+                circuits[i] = circuits[j]
+            elif circuits[i] != circuits[j]:
+                for k in range(len(circuits)):
+                    if k != j and circuits[k] == circuits[j]:
+                        circuits[k] = circuits[i]
+                circuits[j] = circuits[i]
+        
+        circuitLengths = [0] * len(circuits)
+        for circuit in circuits:
+            if circuit != -1:
+                circuitLengths[circuit] += 1
+        
+        circuitLengths.sort(reverse=True)
+        return circuitLengths[0] * circuitLengths[1] * circuitLengths[2]
+
+
+
+    @staticmethod
+    def __d8p2(fileName):
+        import math
+        with open(fileName) as f:
+            lines = f.readlines()
+
+        points = []
+        for line in lines:
+            point = [int(x) for x in line.split(',')]
+            points.append(point)
+
+        circuits = [-1] * len(points)
+        circuitCnt = 0
+        distances = []
+        for i in range(len(points)):
+            for j in range(i + 1, len(points)):
+                dist = math.sqrt(pow(points[i][0] - points[j][0], 2) + pow(points[i][1] - points[j][1], 2) + pow(points[i][2] - points[j][2], 2))
+                distances.append((dist, i, j))
+        
+        distances.sort()
+        last = tuple()
+
+        for entryInd in range(len(distances)):
+            entry = distances[entryInd]
+            dist, i, j = entry
+
+            if circuits[i] == -1 and circuits[j] == -1:
+                circuits[i] = circuitCnt
+                circuits[j] = circuitCnt
+                circuitCnt += 1
+                last = (i, j)
+            elif circuits[j] == -1:
+                circuits[j] = circuits[i]
+                last = (i, j)
+            elif circuits[i] == -1:
+                circuits[i] = circuits[j]
+                last = (i, j)
+            elif circuits[i] != circuits[j]:
+                for k in range(len(circuits)):
+                    if k != j and circuits[k] == circuits[j]:
+                        circuits[k] = circuits[i]
+                circuits[j] = circuits[i]
+                last = (i, j)
+        
+        return points[last[0]][0] * points[last[1]][0]
 
     __table = {
         1: {
@@ -407,6 +503,10 @@ class AdventOfCode:
         7: {
             1: __d7p1,
             2: __d7p2
+        },
+        8: {
+            1: __d8p1,
+            2: __d8p2
         }
     }
 
@@ -421,4 +521,4 @@ class AdventOfCode:
             print("Day or part not found")
 
 # Usage
-AdventOfCode.Solve(7, 2, "Inputs/Day7/p7.txt")
+AdventOfCode.Solve(8, 2, "Inputs/Day8/p8.txt")
