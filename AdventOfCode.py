@@ -475,6 +475,86 @@ class AdventOfCode:
         
         return points[last[0]][0] * points[last[1]][0]
 
+    def __d9p1(fileName):
+        with open(fileName) as f:
+            lines = f.readlines()
+        points = []
+        for line in lines:
+            point = [int(x) for x in line.split(',')]
+            points.append(point)
+        maxArea = 0
+
+        for i in range(len(points)):
+            for j in range(i + 1, len(points)):
+                xDiff = abs(points[i][0] - points[j][0]) + 1
+                yDiff = abs(points[i][1] - points[j][1]) + 1
+                area = xDiff * yDiff
+
+                if area > maxArea:
+                    maxArea = area
+        return maxArea
+
+
+    def __d9p2(fileName):
+        def crossesRect(rect, segment):
+            rx1, ry1, rx2, ry2 = rect
+            x1, y1, x2, y2 = segment
+
+            xMin, xMax = min(rx1, rx2), max(rx1, rx2)
+            yMin, yMax = min(ry1, ry2), max(ry1, ry2)
+
+            if xMin < x1 < xMax and yMin < y1 < yMax:
+                return True
+            if xMin < x2 < xMax and yMin < y2 < yMax:
+                return True
+
+            if y1 == y2:
+                if yMin < y1 < yMax:
+                    segXMin, segXMax = min(x1, x2), max(x1, x2)
+                    if segXMax > xMin and segXMin < xMax:
+                        return True
+
+            if x1 == x2:
+                if xMin < x1 < xMax:
+                    segYMin, segYMax = min(y1, y2), max(y1, y2)
+                    if segYMax > yMin and segYMin < yMax:
+                        return True
+
+            return False
+
+        with open(fileName) as f:
+            lines = f.readlines()
+        points = []
+        for line in lines:
+            point = [int(x) for x in line.split(',')]
+            points.append(point)
+        maxArea = 0
+
+        for i in range(len(points)):
+            for j in range(i + 1, len(points)):
+                ok = True
+                x1 = points[i][0]
+                y1 = points[i][1]
+                x2 = points[j][0]
+                y2 = points[j][1]
+
+                for k in range(len(points)):
+                    lineStart = points[k]
+                    lineEnd = points[(k + 1) % len(points)]
+
+                    if crossesRect((x1, y1, x2, y2), (lineStart[0], lineStart[1], lineEnd[0], lineEnd[1])):
+                        ok = False
+                        break
+
+                if ok:
+                    xDiff = abs(x1 - x2) + 1
+                    yDiff = abs(y1 - y2) + 1
+                    area = xDiff * yDiff
+
+                    if area > maxArea:
+                        maxArea = area
+        return maxArea
+
     __table = {
         1: {
             1: __d1p1,
@@ -507,6 +587,10 @@ class AdventOfCode:
         8: {
             1: __d8p1,
             2: __d8p2
+        },
+        9: {
+            1: __d9p1,
+            2: __d9p2
         }
     }
 
@@ -521,4 +605,4 @@ class AdventOfCode:
             print("Day or part not found")
 
 # Usage
-AdventOfCode.Solve(8, 2, "Inputs/Day8/p8.txt")
+AdventOfCode.Solve(9, 2, "Inputs/Day9/p9.txt")
