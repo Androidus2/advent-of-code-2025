@@ -1,4 +1,7 @@
 from functools import cache
+from z3 import *
+import math
+from collections import Counter
 
 class AdventOfCode:
 
@@ -381,7 +384,7 @@ class AdventOfCode:
     
     @staticmethod
     def __d8p1(fileName):
-        import math
+        
         with open(fileName) as f:
             lines = f.readlines()
 
@@ -431,7 +434,6 @@ class AdventOfCode:
 
     @staticmethod
     def __d8p2(fileName):
-        import math
         with open(fileName) as f:
             lines = f.readlines()
 
@@ -475,6 +477,7 @@ class AdventOfCode:
         
         return points[last[0]][0] * points[last[1]][0]
 
+    @staticmethod
     def __d9p1(fileName):
         with open(fileName) as f:
             lines = f.readlines()
@@ -495,6 +498,7 @@ class AdventOfCode:
         return maxArea
 
 
+    @staticmethod
     def __d9p2(fileName):
         def crossesRect(rect, segment):
             rx1, ry1, rx2, ry2 = rect
@@ -554,6 +558,110 @@ class AdventOfCode:
                     if area > maxArea:
                         maxArea = area
         return maxArea
+    
+    @staticmethod
+    def __d10p1(fileName):
+        def circleBracketToNumber(circle, bitCnt):
+            circle = circle[1:-1]
+            num = 0
+            numbersInCircle = [int(x) for x in circle.split(',')]
+            for number in numbersInCircle:
+                num += 1 << (bitCnt - number - 1)
+            return num
+        
+        def targetToTargetNum(target):
+            num = 0
+            for i in range(len(target)):
+                if target[i] == '#':
+                    num += 1 << (len(target) - i - 1)
+            return num
+        
+        def solve(currentNum, target, numbers, index, totalMoves):
+            if index >= len(numbers):
+                if currentNum == target:
+                    return totalMoves
+                return len(numbers) + 1
+            minn = solve(currentNum, target, numbers, index + 1, totalMoves)
+            minn = min(minn, solve(currentNum ^ numbers[index], target, numbers, index + 1, totalMoves + 1))
+            return minn
+
+        with open(fileName) as f:
+            lines = f.readlines()
+        ans = 0
+
+        for line in lines:
+            squareBracketSplit = line.split(']')
+            target = squareBracketSplit[0][1:]
+            targetNum = targetToTargetNum(target)
+            circles = squareBracketSplit[1].split('{')[0].strip()
+            numbers = []
+            for circle in circles.split():
+                num = circleBracketToNumber(circle, len(target))
+                numbers.append(num)
+            ans += solve(0, targetNum, numbers, 0, 0)
+        return ans
+
+
+
+    @staticmethod
+    def __d10p2(fileName):
+        def solve(nums, patterns):
+            n = len(nums)
+            s = Solver()
+
+            x = [Int(f"x_{j}") for j in range(len(patterns))]
+            for var in x:
+                s.add(var >= 0)
+
+            A = {
+                i: [1 if i in pattern else 0 for pattern in patterns]
+                for i in range(n)
+            }
+
+            for i in range(n):
+                s.add(sum(x[j] * A[i][j] for j in range(len(patterns))) == nums[i])
+
+            total = Int("total")
+            s.add(total == sum(x))
+
+            lo = 0
+            hi = sum(nums)
+
+            best = None
+
+            while lo <= hi:
+                mid = (lo + hi) // 2
+
+                s.push()
+                s.add(total <= mid)
+                if s.check() == sat:
+                    best = s.model()
+                    hi = mid - 1
+                else:
+                    lo = mid + 1
+                s.pop()
+
+            cost = best.evaluate(total).as_long()
+
+            return cost
+
+
+
+        with open(fileName) as f:
+            lines = f.readlines()
+        ans = 0
+        for line in lines:
+            squareBracketSplit = line.split(']')
+            curlyBracketSplit = squareBracketSplit[1].split('{')
+            goals = [int(x) for x in curlyBracketSplit[1].strip()[:-1].split(',')]
+            circles = curlyBracketSplit[0].strip()
+            numbers = []
+            for circle in circles.split():
+                shortCircle = circle[1:-1]
+                nums = [int(x) for x in shortCircle.split(',')]
+                numbers.append(nums)
+            ans += solve(goals, numbers)
+        return ans
 
     __table = {
         1: {
@@ -591,6 +699,10 @@ class AdventOfCode:
         9: {
             1: __d9p1,
             2: __d9p2
+        },
+        10: {
+            1: __d10p1,
+            2: __d10p2
         }
     }
 
@@ -605,4 +717,4 @@ class AdventOfCode:
             print("Day or part not found")
 
 # Usage
-AdventOfCode.Solve(9, 2, "Inputs/Day9/p9.txt")
+AdventOfCode.Solve(10, 2, "Inputs/Day10/p10.txt")
