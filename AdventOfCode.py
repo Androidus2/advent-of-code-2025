@@ -663,6 +663,68 @@ class AdventOfCode:
             ans += solve(goals, numbers)
         return ans
 
+    @staticmethod
+    def __d11p1(fileName):
+        def dfs(graph, node):
+            if node == 'out':
+                return 1
+            if node not in graph:
+                return 0
+            ret = 0
+            for connectedNode in graph[node]:
+                ret += dfs(graph, connectedNode)
+            return ret
+
+        with open(fileName) as f:
+            lines = f.readlines()
+        
+        graph = {}
+
+        for line in lines:
+            colonSplit = line.split(':')
+            startingNode = colonSplit[0]
+            destinationNodes = colonSplit[1].strip().split()
+            graph[startingNode] = destinationNodes
+        
+        ans = dfs(graph, 'you')
+        return ans
+
+
+
+    @staticmethod
+    def __d11p2(fileName):
+        graph = {}
+
+        @cache
+        def dfs(node, visitedFFT, visitedDAC):
+            if node == 'out':
+                if visitedDAC and visitedFFT:
+                    return 1
+                return 0
+            if node not in graph:
+                return 0
+            if node == 'fft':
+                visitedFFT = True
+            if node == 'dac':
+                visitedDAC = True
+            ret = 0
+            for connectedNode in graph[node]:
+                ret += dfs(connectedNode, visitedFFT, visitedDAC)
+            return ret
+
+        with open(fileName) as f:
+            lines = f.readlines()
+        
+
+        for line in lines:
+            colonSplit = line.split(':')
+            startingNode = colonSplit[0]
+            destinationNodes = colonSplit[1].strip().split()
+            graph[startingNode] = destinationNodes
+        
+        ans = dfs('svr', False, False)
+        return ans
+
     __table = {
         1: {
             1: __d1p1,
@@ -703,6 +765,10 @@ class AdventOfCode:
         10: {
             1: __d10p1,
             2: __d10p2
+        },
+        11: {
+            1: __d11p1,
+            2: __d11p2
         }
     }
 
@@ -717,4 +783,4 @@ class AdventOfCode:
             print("Day or part not found")
 
 # Usage
-AdventOfCode.Solve(10, 2, "Inputs/Day10/p10.txt")
+AdventOfCode.Solve(11, 2, "Inputs/Day11/p11.txt")
