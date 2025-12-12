@@ -724,6 +724,23 @@ class AdventOfCode:
         
         ans = dfs('svr', False, False)
         return ans
+    
+    @staticmethod
+    def __d12p1(fileName):
+        with open(fileName) as f:
+            lines = f.readlines()
+        
+        ans = 0
+
+        for line in lines[::-1]:
+            if len(line.strip()) == 0:
+                break
+            colonSplit = line.strip().split(':')
+            n, m = [int(x) // 3 for x in colonSplit[0].split('x')]
+            numbers = [int(x) for x in colonSplit[1].strip().split()]
+            if n * m >= sum(numbers):
+                ans += 1
+        return ans
 
     __table = {
         1: {
@@ -769,6 +786,9 @@ class AdventOfCode:
         11: {
             1: __d11p1,
             2: __d11p2
+        },
+        12: {
+            1: __d12p1
         }
     }
 
@@ -783,4 +803,4 @@ class AdventOfCode:
             print("Day or part not found")
 
 # Usage
-AdventOfCode.Solve(11, 2, "Inputs/Day11/p11.txt")
+AdventOfCode.Solve(12, 1, "Inputs/Day12/p12.txt")
